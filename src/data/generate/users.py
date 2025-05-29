@@ -22,7 +22,7 @@ def generate_users(n):
         risk = random.choices([True, False], weights=[0.05, 0.95])[0]
 
         users.append({
-            "user_id": str(uuid.uuid4()),
+            "id": str(uuid.uuid4()),
             "full_name": fake.name(),
             "email": fake.email(),
             "signup_date": signup_date,

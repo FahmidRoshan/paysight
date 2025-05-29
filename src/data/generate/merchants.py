@@ -19,8 +19,8 @@ def generate_merchants(n):
         risk = random.choices([True, False], weights=[0.1, 0.9])[0]
 
         merchants.append({
-            "merchant_id": str(uuid.uuid4()),
-            "merchant_name": fake.company(),
+            "id": str(uuid.uuid4()),
+            "name": fake.company(),
             "business_category": random.choice(categories),
             "signup_date": signup,
             "location": random.choice(cities),
