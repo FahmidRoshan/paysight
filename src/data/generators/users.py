@@ -13,7 +13,7 @@ def generate_users(n):
     kyc_statuses = ['Not Started', 'In Progress', 'Verified', 'Failed']
     locations = ['New York', 'San Francisco', 'Chicago', 'Austin', 'Boston']
     users = []
-
+    n = max(n, N_USERS)
     for _ in range(n):
         signup_date = fake.date_between(start_date='-1y', end_date='today')
         last_login = signup_date + timedelta(days=random.randint(0, 300))

@@ -1,8 +1,9 @@
 import psycopg2
 from psycopg2 import sql
 import pandas as pd
-from config import database_config
+from settings import database_config
 from utils.logger import get_logger
+from core.models import TableData
 
 class PostgresHandler:
 
@@ -23,36 +24,61 @@ class PostgresHandler:
             logger.exception(f"Exception occurred: {exc_type.__name__} - {exc_val}")
 
 
-    def insert_data(self, TableData):
+    def run_query(self, query):
         logger = get_logger("DB Handler")
-        if TableData.records.empty:
-            logger.log("Empty Datafram, No records to insert")
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute(query)
+
+            self.conn.commit()
+            logger.info("Query is executed successfully.")
+        except Exception as e:
+            self.conn.rollback()
+            logger.exception("Failed to execute SQL statements.")
+            raise
+
+
+    def insert_data(self, table_data: TableData):
+        logger = get_logger("DB Handler")
+
+        if table_data.data.empty:
+            logger.info("Empty DataFrame, no records to insert")
             return
-        
-
-        columns = TableData.records.columns
-
-        query = sql.SQL(    
-            """INSERT INTO {table} ({fields}) VALUES {values}
-        """
-        ).format(
-            table = sql.Identifier(TableData.table_name),
-            fields = sql.SQL(', ').join(map(sql.Identifier, columns)),
-            values = sql.SQL(', ').join([
-                sql.SQL('({})').format(
-                    sql.SQL(', ').join(sql.Placeholder() * len(columns))
-                )
-                for _ in range(len(TableData.records))
-            ])
-        )
 
         try:
-            values_flat = TableData.records.to_numpy().flatten().tolist()
+            df = table_data.data
+            table = sql.Identifier(table_data.table_name)
+            columns = df.columns.tolist()
+            values = df.to_numpy().tolist() 
+
+            insert_query = sql.SQL("INSERT INTO {table} ({fields}) VALUES ({placeholders})").format(
+                table=table,
+                fields=sql.SQL(', ').join(map(sql.Identifier, columns)),
+                placeholders=sql.SQL(', ').join(sql.Placeholder() * len(columns))
+            )
+
             with self.conn.cursor() as cur:
-                cur.execute(query, values_flat)
-                return cur.rowcount  
-        except:
-            logger.exception("Error while inserting data")            
+                for idx, row in enumerate(values):
+                    try:
+                        cur.execute(insert_query, row)
+                    except Exception as row_err:
+                        logger.error(f"Failed at row {idx}: {row}")
+                        for col_idx, val in enumerate(row):
+                            col_name = columns[col_idx]
+                            try:
+                                _ = str(val) < 1  # dummy operation to simulate the problematic one
+                            except Exception as col_err:
+                                logger.error(f"Column '{col_name}' with value '{val}' caused error: {col_err}")
+                        raise  # optional: continue or re-raise
+
+                self.conn.commit()
+                logger.info(f"Inserted {len(values)} rows into '{table_data.table_name}'")
+                return len(values)
+
+        except Exception as e:
+            logger.exception("Error while inserting data into %s", table_data.table_name)
+            self.conn.rollback()
+            raise
 
 
     def read_columns(self, table_name:str, columns:list):

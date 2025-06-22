@@ -1,3 +1,78 @@
 {
-    
+  "users": {
+    "id": "str",
+    "full_name": "str",
+    "email": "str",
+    "signup_date": "datetime",
+    "signup_method": "str",
+    "kyc_status": "str",
+    "device_id": "str",
+    "location": "str",
+    "is_active": "bool",
+    "last_login": "datetime",
+    "risk_flag": "bool"
+  },
+  "merchants": {
+    "id": "str",
+    "name": "str",
+    "business_category": "str",
+    "signup_date": "datetime",
+    "location": "str",
+    "kyc_status": "str",
+    "is_active": "bool",
+    "risk_flag": "bool"
+  },
+  "transactions": {
+    "id": "str",
+    "user_id": "str",
+    "merchant_id": "str",
+    "amount": "float",
+    "currency": "str",
+    "status": "str",
+    "payment_method": "str",
+    "device_id": "str",
+    "created_at": "datetime",
+    "is_fraud": "bool",
+    "refunded_amount": "float"
+  },
+  "payouts": {
+    "id": "str",
+    "merchant_id": "str",
+    "payout_date": "datetime",
+    "amount": "float",
+    "payout_status": "str",
+    "transaction_count": "int",
+    "processing_time_delays": "int",
+    "is_delayed": "bool"
+  },
+  "refunds": {
+    "id": "str",
+    "transaction_id": "str",
+    "user_id": "str",
+    "merchant_id": "str",
+    "refund_date": "datetime",
+    "refund_amount": "float",
+    "refund_reason": "str",
+    "refund_status": "str"
+  },
+  "login_events": {
+    "id": "str",
+    "user_id": "str",
+    "device_id": "str",
+    "login_time": "datetime",
+    "login_status": "str",
+    "ip_address": "str",
+    "location": "str",
+    "is_suspicious": "bool"
+  },
+  "product_events": {
+    "id": "str",
+    "user_id": "str",
+    "event_type": "str",
+    "event_timestamp": "datetime",
+    "session_id": "str",
+    "product_id": "str",
+    "device_id": "str",
+    "location": "str"
+  }
 }

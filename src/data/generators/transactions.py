@@ -12,7 +12,7 @@ def generate_transactions(n, users_df, merchants_df):
     methods = ['card', 'UPI', 'netbanking', 'wallet']
     currency = 'USD'
     txns = []
-
+    n = max(n, N_TRANSACTIONS)
     for _ in range(n):
         user = users_df.sample(1).iloc[0]
         status = random.choices(statuses, weights=[0.85, 0.1, 0.05])[0]
@@ -22,7 +22,7 @@ def generate_transactions(n, users_df, merchants_df):
         merchant = merchants_df.sample(1).iloc[0]
 
         txns.append({
-            "transaction_id": str(uuid.uuid4()),
+            "id": str(uuid.uuid4()),
             "user_id": user['id'],
             "merchant_id": merchant['id'],
             "amount": amount,
